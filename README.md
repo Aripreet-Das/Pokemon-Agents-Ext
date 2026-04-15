@@ -67,4 +67,4 @@ This project is licensed under the **Professor Aripreet Public License (PAPL)** 
 
 ---
 
-*Built with ❤️ by Trainer **Aripreets***
+*Built with ❤️ by Trainer **Aripreet***
