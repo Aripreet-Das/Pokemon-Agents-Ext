@@ -44,7 +44,7 @@ Recruit Generation 1 Pokémon as your sub-agents. Each comes with a unique "Type
    ```bash
    git clone https://github.com/Aripreet-Das/Pokemon-Agents-Ext.git
    ```
-2. Install all dependencies:
+2. Install all dependencies after selecting the file directory:
    ```bash
    npm run install:all
    ```
