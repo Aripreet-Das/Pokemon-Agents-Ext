@@ -26,7 +26,7 @@ Launch a review on any local folder. Your assigned agent will:
    - 📋 **Actionable Roadmap**
 
 ### 📔 The PokéDex Menu
-Recruit Generation 1-4 Pokémon as your sub-agents. Each comes with a unique "Type" and aesthetic glow.
+Recruit Generation 1 Pokémon as your sub-agents. Each comes with a unique "Type" and aesthetic glow.
 
 ---
 
