@@ -1,0 +1,12 @@
+{
+  "name": "pokedex-extension-root",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Root workspace for the PokéDex VS Code extension.",
+  "scripts": {
+    "install:all": "cd webview-ui && npm install && cd ../extension && npm install",
+    "build:all": "cd webview-ui && npm run build && cd ../extension && npm run compile",
+    "package": "npm run build:all && cd extension && npx vsce package",
+    "ready": "echo 'Trainer! Your PokéDex is ready for deployment. Run npm run build:all then hit F5!'"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "name": "pokemon-agents",
+  "displayName": "PokéDex",
+  "description": "Functional Pokémon Sub-Agents for your project.",
+  "version": "0.1.0",
+  "publisher": "pokedex-trainer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/pokedex-extension"
+  },
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Education",
+    "Programming Languages"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "poke-agents-sidebar",
+          "title": "PokéDex",
+          "icon": "media/pokedex-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "poke-agents-sidebar": [
+        {
+          "type": "webview",
+          "id": "poke-agents-dashboard",
+          "name": "Trainer Dashboard"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "poke-agents.addAgent",
+        "title": "Add Poke-Agent"
+      },
+      {
+        "command": "poke-agents.reviewFolder",
+        "title": "Review Assigned Folder"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "18.x",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.3.3"
+  }
+}

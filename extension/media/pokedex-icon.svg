@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle border -->
+  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+  <!-- Horizontal dividing line -->
+  <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+  <!-- Center button outer ring -->
+  <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="2"/>
+  <!-- Center button inner dot -->
+  <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+</svg>
