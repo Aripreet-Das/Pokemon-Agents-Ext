@@ -33,7 +33,7 @@ Recruit Generation 1 Pokémon as your sub-agents. Each comes with a unique "Type
 ## 🛠️ How to Install
 
 ### From VSIX (Easiest)
-1. Download the latest `pokedex-x.x.x.vsix` from the [Releases](https://github.com/Aripreet-Das/Pokemon-Agents-Ext/releases) page.
+1. Download the latest `pokemon-agents-0.1.0.vsix` from the [Releases](https://github.com/Aripreet-Das/Pokemon-Agents-Ext/releases) page.
 2. Open VS Code.
 3. Go to the Extensions view (`Cmd+Shift+X`).
 4. Click the "..." menu in the top right and select **Install from VSIX...**
