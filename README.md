@@ -59,7 +59,8 @@ Recruit Generation 1 Pokémon as your sub-agents. Each comes with a unique "Type
 ## 💿 Skill Manuals (TMs)
 You can teach your agents any specialty by assigning them a `.md` or `.txt` file. 
 - Assignments can range from "Senior Security Audit" to "Frontend Performance Ninja."
-You'll be needed to install Git Copilot in order to achieve it's full potential)
+
+(You'll be needed to install Git Copilot in order to achieve it's full potential)
 ---
 
 ## ⚖️ License
