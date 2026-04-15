@@ -300,8 +300,9 @@ Produce a structured report in this EXACT format:
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        const scriptPath = path.join(this._extensionUri.fsPath, '..', 'webview-ui', 'dist', 'index.js');
-        const stylePath  = path.join(this._extensionUri.fsPath, '..', 'webview-ui', 'dist', 'index.css');
+        const webviewDistPath = path.join(this._extensionUri.fsPath, 'dist', 'webview');
+        const scriptPath = path.join(webviewDistPath, 'index.js');
+        const stylePath  = path.join(webviewDistPath, 'index.css');
 
         const scriptUri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
         const styleUri  = webview.asWebviewUri(vscode.Uri.file(stylePath));

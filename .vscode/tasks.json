@@ -17,7 +17,17 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "dependsOn": ["copy-webview"]
+    },
+    {
+      "label": "copy-webview",
+      "type": "shell",
+      "command": "cp -r ${workspaceFolder}/webview-ui/dist ${workspaceFolder}/extension/dist/webview",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
     }
   ]
 }

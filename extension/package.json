@@ -53,13 +53,19 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run compile && node -e \"const fs=require('fs');const path=require('path');const src=path.join(__dirname,'..','webview-ui','dist');const dst=path.join(__dirname,'dist','webview');if(fs.existsSync(src)){fs.cpSync(src,dst,{recursive:true});}else{console.warn('webview-ui/dist not found, skipping copy.');}\"",
     "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
+  "files": [
+    "dist/**",
+    "media/**",
+    "icon.png",
+    "LICENSE.md"
+  ],
   "devDependencies": {
     "@types/vscode": "^1.90.0",
     "@types/node": "18.x",
