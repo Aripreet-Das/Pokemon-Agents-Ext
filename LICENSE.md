@@ -1,4 +1,4 @@
-# Professor Aripreet’s Public License (POPL)
+# Professor Aripreet’s Public License (PAPL)
 Version 151.0
 
 Copyright (c) 2026 PokéDex Lead Architect Trainer

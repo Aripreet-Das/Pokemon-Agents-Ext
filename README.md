@@ -59,7 +59,7 @@ You can teach your agents any specialty by assigning them a `.md` or `.txt` file
 ---
 
 ## ⚖️ License
-This project is licensed under the **Professor Aripreet Public License (POPL)** — see the [LICENSE](LICENSE.md) file for more Poké-nerdy details.
+This project is licensed under the **Professor Aripreet Public License (PAPL)** — see the [LICENSE](LICENSE.md) file for more Poké-nerdy details.
 
 ---
 
