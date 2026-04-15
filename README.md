@@ -6,6 +6,11 @@
 
 ---
 
+## 📸 Preview
+![Trainer Dashboard](extension/media/preview.png)
+
+---
+
 ## 🔥 Key Features
 
 ### 🏢 Trainer Dashboard
