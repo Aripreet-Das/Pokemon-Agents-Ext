@@ -6,7 +6,10 @@
   "publisher": "pokedex-trainer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/pokedex-extension"
+    "url": "https://github.com/Aripreet-Das/Pokemon-Agents-Ext"
+  },
+  "bugs": {
+    "url": "https://github.com/Aripreet-Das/Pokemon-Agents-Ext/issues"
   },
   "icon": "icon.png",
   "engines": {
