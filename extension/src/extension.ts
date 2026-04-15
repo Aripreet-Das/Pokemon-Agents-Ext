@@ -90,7 +90,7 @@ class PokeAgentsViewProvider implements vscode.WebviewViewProvider {
             enableScripts: true,
             localResourceRoots: [
                 this._extensionUri,
-                vscode.Uri.file(path.join(this._extensionUri.fsPath, '..'))
+                vscode.Uri.file(path.join(this._extensionUri.fsPath, 'dist'))
             ]
         };
 
@@ -301,28 +301,19 @@ Produce a structured report in this EXACT format:
 
     private _getHtmlForWebview(webview: vscode.Webview) {
         const webviewDistPath = path.join(this._extensionUri.fsPath, 'dist', 'webview');
-        const scriptPath = path.join(webviewDistPath, 'index.js');
-        const stylePath  = path.join(webviewDistPath, 'index.css');
+        const indexPath = path.join(webviewDistPath, 'index.html');
+        
+        // Read the built index.html from Vite
+        let html = fs.readFileSync(indexPath, 'utf8');
 
-        const scriptUri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
-        const styleUri  = webview.asWebviewUri(vscode.Uri.file(stylePath));
+        // Replace relative paths with webview URIs
+        // This regex finds src="./..." or href="./..." and replaces them
+        html = html.replace(/(src|href)=".\/([^"]+)"/g, (_, attr, file) => {
+            const resourcePath = path.join(webviewDistPath, file);
+            const uri = webview.asWebviewUri(vscode.Uri.file(resourcePath));
+            return `${attr}="${uri}"`;
+        });
 
-        return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="${styleUri}" rel="stylesheet">
-                <title>PokéDex</title>
-                <style>
-                  @keyframes spin { to { transform: rotate(360deg); } }
-                  body { margin: 0; background: transparent; }
-                </style>
-            </head>
-            <body>
-                <div id="root"></div>
-                <script type="module" src="${scriptUri}"></script>
-            </body>
-            </html>`;
+        return html;
     }
 }
