@@ -18,6 +18,13 @@ const TEXT_EXTENSIONS = new Set([
 
 const MAX_FILE_SIZE = 50 * 1024; // 50KB per file
 const MAX_FILES = 30;
+const MAX_CONTEXT_CHARS = 100_000; // Context cap to avoid API timeouts
+
+const IGNORE_DIRS = new Set([
+    'node_modules', '.next', '.git', 'dist', 'build', '.cache',
+    '__pycache__', '.venv', 'venv', '.vercel', '.serverless',
+    'coverage', 'out', '.turbo', '.parcel-cache', 'vendor'
+]);
 
 function isTextFile(filePath: string): boolean {
     return TEXT_EXTENSIONS.has(path.extname(filePath).toLowerCase());
@@ -33,12 +40,10 @@ function readFilesRecursively(dir: string, prefix = ''): { name: string; content
         return results;
     }
 
-    const IGNORE = new Set(['node_modules', '.next', '.git', 'dist', 'build', '.cache', '__pycache__', '.venv']);
-
     for (const entry of entries) {
-        if (results.length >= MAX_FILES) break;
-        if (entry.name.startsWith('.') && entry.name !== '.env') continue;
-        if (IGNORE.has(entry.name)) continue;
+        if (results.length >= MAX_FILES) { break; }
+        if (entry.name.startsWith('.') && entry.name !== '.env') { continue; }
+        if (IGNORE_DIRS.has(entry.name)) { continue; }
 
         const fullPath = path.join(dir, entry.name);
         const relativeName = prefix ? `${prefix}/${entry.name}` : entry.name;
@@ -64,7 +69,6 @@ function readFilesRecursively(dir: string, prefix = ''): { name: string; content
 
 export function activate(context: vscode.ExtensionContext) {
     const provider = new PokeAgentsViewProvider(context.extensionUri, context);
-
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(PokeAgentsViewProvider.viewType, provider)
     );
@@ -150,27 +154,40 @@ class PokeAgentsViewProvider implements vscode.WebviewViewProvider {
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `${agentName} is launching a Review Quest...`,
+            title: `⚡ ${agentName} is launching a Review Quest...`,
             cancellable: false
         }, async (progress) => {
 
-            // ── 1. Read code context ─────────────────────────────────────────
-            progress.report({ message: 'Scanning files...' });
+            // ── 1. Scan files ─────────────────────────────────────────────────
+            progress.report({ message: 'Scanning your codebase...' });
             const files = readFilesRecursively(folderPath);
 
+            // ── 2. Apply context cap ──────────────────────────────────────────
             let contextText = '';
+            let charsUsed = 0;
+            let filesIncluded = 0;
+
             for (const file of files) {
-                contextText += `\n\n### FILE: ${file.name}\n\`\`\`\n${file.content}\n\`\`\``;
+                const entry = `\n\n### FILE: ${file.name}\n\`\`\`\n${file.content}\n\`\`\``;
+                if (charsUsed + entry.length > MAX_CONTEXT_CHARS) {
+                    contextText += `\n\n> ⚡ Context cap reached — ${files.length - filesIncluded} more files were omitted to prevent timeout.`;
+                    break;
+                }
+                contextText += entry;
+                charsUsed += entry.length;
+                filesIncluded++;
             }
 
-            // ── 2. Read skill file ────────────────────────────────────────────
+            progress.report({ message: `Scanned ${filesIncluded}/${files.length} files (${Math.round(charsUsed / 1000)}k chars). Building prompt...` });
+
+            // ── 3. Read skill file ────────────────────────────────────────────
             let skillText = `You are a senior software architect performing a brutal but constructive code review.
 Focus on: code quality, performance, security, maintainability, and best practices.`;
             if (skillPath && fs.existsSync(skillPath)) {
                 skillText = fs.readFileSync(skillPath, 'utf8');
             }
 
-            // ── 3. Build master prompt ────────────────────────────────────────
+            // ── 4. Build master prompt ────────────────────────────────────────
             const folderName = path.basename(folderPath);
             const now = new Date().toLocaleString();
 
@@ -182,7 +199,7 @@ ${skillText}`;
 
             const userPrompt = `Review the following codebase and produce a formal PRD-style report.
 
-TARGET: ${folderName} (${files.length} files scanned)
+TARGET: ${folderName} (${filesIncluded}/${files.length} files scanned)
 DATE: ${now}
 
 ${contextText}
@@ -212,12 +229,12 @@ Produce a structured report in this EXACT format:
 
 ---
 
-## ⚠️ HIGH PRIORITY ISSUES  
+## ⚠️ HIGH PRIORITY ISSUES
 [Same format, for significant but non-critical issues]
 
 ---
 
-## 🔧 MEDIUM PRIORITY  
+## 🔧 MEDIUM PRIORITY
 [Same format, for code quality, maintainability, and performance issues]
 
 ---
@@ -240,14 +257,20 @@ Produce a structured report in this EXACT format:
 - **Sprint 3 (Next week):** [Medium + improvements]
 
 ---
-*Review conducted by ${agentName} • Pokémon-Agents Extension*`;
+*Review conducted by ${agentName} • PokéDex Extension*`;
 
-            // ── 4. Try VS Code Language Model API (GitHub Copilot) ───────────
-            progress.report({ message: 'Consulting the Pokémon...' });
+            // ── 5. Open document immediately so user sees activity ────────────
+            progress.report({ message: 'Opening report... AI is writing live ⚡' });
 
-            let reportContent = '';
+            const doc = await vscode.workspace.openTextDocument({
+                content: `<!-- ⚡ ${agentName} is writing your review in real-time... -->\n\n`,
+                language: 'markdown'
+            });
+            const editor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.Active);
+
             let usedAI = false;
 
+            // ── 6. Try VS Code Language Model API with LIVE STREAMING ─────────
             try {
                 const models = await vscode.lm.selectChatModels({
                     vendor: 'copilot',
@@ -260,39 +283,50 @@ Produce a structured report in this EXACT format:
                         vscode.LanguageModelChatMessage.User(`${systemPrompt}\n\n${userPrompt}`)
                     ];
 
+                    // Clear placeholder text before streaming starts
+                    await editor.edit(editBuilder => {
+                        const fullRange = new vscode.Range(
+                            doc.positionAt(0),
+                            doc.positionAt(doc.getText().length)
+                        );
+                        editBuilder.replace(fullRange, '');
+                    });
+
                     const response = await model.sendRequest(messages, {});
+
+                    // ⚡ Stream each chunk live into the document
                     for await (const chunk of response.text) {
-                        reportContent += chunk;
+                        await editor.edit(editBuilder => {
+                            const lastLine = doc.lineAt(doc.lineCount - 1);
+                            editBuilder.insert(lastLine.range.end, chunk);
+                        });
                     }
                     usedAI = true;
                 }
             } catch (err) {
-                // Copilot not available — fall back to assembled prompt
                 console.log('LM API not available, using clipboard fallback:', err);
             }
 
-            // ── 5. Fallback: assembled prompt for manual use ──────────────────
+            // ── 7. Fallback: write assembled prompt into document ─────────────
             if (!usedAI) {
-                reportContent = `${systemPrompt}\n\n${userPrompt}`;
-                await vscode.env.clipboard.writeText(reportContent);
+                const fallbackContent = `<!-- ⚠️  GitHub Copilot not detected. This is the Review Quest PROMPT.
+     Paste it into ChatGPT, Claude, or any AI to get the full report. -->
+
+${systemPrompt}
+
+${userPrompt}`;
+                await editor.edit(editBuilder => {
+                    const fullRange = new vscode.Range(
+                        doc.positionAt(0),
+                        doc.positionAt(doc.getText().length)
+                    );
+                    editBuilder.replace(fullRange, fallbackContent);
+                });
+                await vscode.env.clipboard.writeText(`${systemPrompt}\n\n${userPrompt}`);
             }
 
-            // ── 6. Open as formatted markdown document ────────────────────────
-            progress.report({ message: 'Preparing report...' });
-
-            const header = usedAI
-                ? `<!-- Generated by ${agentName} (Pokémon-Agents) -->\n\n`
-                : `<!-- ⚠️  GitHub Copilot not detected. This is the Review Quest PROMPT.\n     Paste it into your AI of choice to get the full report. -->\n\n`;
-
-            const doc = await vscode.workspace.openTextDocument({
-                content: header + reportContent,
-                language: 'markdown'
-            });
-
-            await vscode.window.showTextDocument(doc, vscode.ViewColumn.Active);
-
             const msg = usedAI
-                ? `${agentName} completed the Review Quest! Report opened. 🔥`
+                ? `${agentName} completed the Review Quest! Report written live. 🔥`
                 : `${agentName} assembled the Review Quest prompt. Copilot not found — paste it into your AI. (Copied to clipboard)`;
 
             vscode.window.showInformationMessage(msg);
@@ -302,13 +336,12 @@ Produce a structured report in this EXACT format:
     private _getHtmlForWebview(webview: vscode.Webview) {
         const webviewDistPath = path.join(this._extensionUri.fsPath, 'dist', 'webview');
         const indexPath = path.join(webviewDistPath, 'index.html');
-        
-        // Read the built index.html from Vite
+
+        // Read the Vite-built index.html
         let html = fs.readFileSync(indexPath, 'utf8');
 
-        // Replace relative paths with webview URIs
-        // This regex finds src="./..." or href="./..." and replaces them
-        html = html.replace(/(src|href)=".\/([^"]+)"/g, (_, attr, file) => {
+        // Replace relative asset paths with proper VS Code Webview URIs
+        html = html.replace(/(src|href)="\.\/([^"]+)"/g, (_, attr, file) => {
             const resourcePath = path.join(webviewDistPath, file);
             const uri = webview.asWebviewUri(vscode.Uri.file(resourcePath));
             return `${attr}="${uri}"`;
