@@ -1,4 +1,4 @@
-# 🔴 PokéDex — AI Sub-Agent Trainer
+# 🔴 Pokémon VS Code Extension — AI Sub-Agent Trainer
 
 [![Gotta Program 'em All](https://img.shields.io/badge/Status-Gotta_Program_'em_All-red?style=for-the-badge&logo=pokemon)](https://github.com/Aripreet-Das/Pokemon-Agents-Ext)
 
