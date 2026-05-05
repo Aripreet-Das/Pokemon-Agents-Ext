@@ -2,7 +2,7 @@
 
 [![Gotta Program 'em All](https://img.shields.io/badge/Status-Gotta_Program_'em_All-red?style=for-the-badge&logo=pokemon)](https://github.com/Aripreet-Das/Pokemon-Agents-Ext)
 
-**PokéDex** is a high-performance VS Code extension that turns your codebase into a training ground for Pokémon Sub-Agents. Recruit agents, assign them "Skill Manuals," and launch them on **Review Quests** to perform brutally honest architectural analysis.
+**PokéDex** is a high-performance VS Code extension that turns your codebase into a training ground for Pokémon Agents. Recruit agents, assign them "Skill Manuals," and launch them on **Review Quests** to perform brutally honest architectural analysis.
 
 ---
 
@@ -26,7 +26,7 @@ Launch a review on any local folder. Your assigned agent will:
    - 📋 **Actionable Roadmap**
 
 ### 📔 The PokéDex Menu
-Recruit Generation 1 Pokémon as your sub-agents. Each comes with a unique "Type" and aesthetic glow.
+Recruit Generation 1 Pokémon as your agents. Each comes with a unique "Type" and aesthetic glow.
 
 ---
 
